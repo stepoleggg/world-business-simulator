@@ -97,9 +97,7 @@ class Human {
     spend() {
         let worstNeedIdx = null;
         let worstNeedValue = null;
-        let needstr = '';
         for (let needIdx in this.needs) {
-            needstr += needIdx + ' ';
             if ((worstNeedValue === null || this.needs[needIdx] < worstNeedValue) 
                 && this.world.needs[needIdx] !== undefined) {
                 worstNeedValue = this.needs[needIdx];

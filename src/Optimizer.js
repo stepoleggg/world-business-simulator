@@ -1,7 +1,6 @@
 import generateValue from './Generator.js';
 
 /*
-
 actionExample = {
     apply: function(value) {...},
     cancel: function(value) {...},
@@ -9,7 +8,8 @@ actionExample = {
 */
 
 class Optimizer {
-    constructor(actionsList, valueParams, repeatChance = 0.99) {
+    constructor(optimizingObject, actionsList, valueParams, repeatChance = 0.99) {
+        this.optimizingObject = optimizingObject;
         this.actionsList = actionsList;
         this.repeatChance = repeatChance;
         this.valueParams = valueParams;
@@ -17,10 +17,10 @@ class Optimizer {
         this.lastAction = null;
     }
 
-    optimize(value) {
+    optimize(optimizingValue) {
         let action;
-        if (this.lastValue !== null && value > this.lastValue) {
-            if (Math.random() < settings.actions.repeatChance) {
+        if (this.lastValue !== null && optimizingValue > this.lastValue) {
+            if (Math.random() < this.repeatChance) {
                 action = this.lastAction;
             } else {
                 action = this.generateRandomAction();
@@ -33,7 +33,7 @@ class Optimizer {
         }
         this.applyAction(action);
         this.lastAction = action;
-        this.lastValue = value;
+        this.lastValue = optimizingValue;
     }
 
     generateRandomAction() {
@@ -45,10 +45,12 @@ class Optimizer {
     }
 
     applyAction(action) {
-        action.functions.apply(action.value);
+        action.functions.apply(this.optimizingObject, action.value);
     }
 
     cancelAction(action) {
-        action.functions.cancel(action.value);
+        action.functions.cancel(this.optimizingObject, action.value);
     }
 }
+
+export default Optimizer;

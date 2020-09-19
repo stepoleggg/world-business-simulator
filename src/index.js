@@ -12,8 +12,8 @@ painter.setApp(app);
 const settings = {
     humans: {
         population: 1000,
-        skillsNumber: 5,
-        needsNumber: 5,
+        skillsNumber: 15,
+        needsNumber: 15,
     },
 }
 
@@ -50,6 +50,7 @@ window.setInterval(() => {
     let sumProducted = 0;
     let sumBusinessWorkMonthes = 0;
     let maxBusinessWorkMonthes = 0;
+    let bestBusiness = null;
 
     for (let human of world.humans) {
         for (let need of human.needs) {
@@ -74,6 +75,9 @@ window.setInterval(() => {
         sumBusinessWorkMonthes += business.workMonthes;
         if (business.workMonthes > maxBusinessWorkMonthes) {
             maxBusinessWorkMonthes = business.workMonthes;
+        }
+        if (bestBusiness === null || business.owner.money > bestBusiness.owner.money) {
+            bestBusiness = business;
         }
     }
 
@@ -101,5 +105,7 @@ window.setInterval(() => {
         averageProducted: ${averageProducted}<br>
         averageBusinessWorkMonthes: ${averageBusinessWorkMonthes}<br>
         maxBusinessWorkMonthes: ${maxBusinessWorkMonthes}<br>
+        bestBusinessMoney: ${bestBusiness.owner.money}<br>
+        bestBusinessServices: ${bestBusiness.services.size}<br>
     `;
 }, 100);

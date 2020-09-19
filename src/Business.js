@@ -1,4 +1,5 @@
 import generateValue from './Generator.js';
+import Optimizer from './Optimizer.js';
 
 const settings = {
     startPrice: {
@@ -10,7 +11,33 @@ const settings = {
         max: 1,
     },
     actions: {
-        list: ['+PRICE', '-SALARY', '-PRICE', '+SALARY', 'NOTHING'],
+        list: [
+            {
+                name: '+PRICE',
+                apply: (business, value) => { business.price *= value },
+                cancel: (business, value) => { business.price /= value },
+            },
+            {
+                name: '-PRICE',
+                apply: (business, value) => { business.price /= value },
+                cancel: (business, value) => { business.price *= value },
+            },
+            {
+                name: '-SALARY',
+                apply: (business, value) => { business.salary /= value },
+                cancel: (business, value) => { business.salary *= value },
+            },
+            {
+                name: '+SALARY',
+                apply: (business, value) => { business.salary *= value },
+                cancel: (business, value) => { business.salary /= value },
+            },
+            {
+                name: 'NOTHING',
+                apply: (business, value) => {},
+                cancel: (business, value) => {},
+            }
+        ],
         value: {
             average: 1.1,
             delta: 0.05,
@@ -31,9 +58,8 @@ class Business {
         this.position = { ...position };
         this.earnings = 0;
         this.sellings = 0;
-        this.lastAction = null;
-        this.lastProfit = 0;
         this.workMonthes = 0;
+        this.optimizer = new Optimizer(this, settings.actions.list, settings.actions.value, settings.actions.repeatChance);
     }
 
     live() {
@@ -80,27 +106,7 @@ class Business {
     optimize() {
         const moneyProfit = this.earnings - this.payings;
         const productProfit = this.productions - this.sellings;
-        let action = {};
-        if (moneyProfit > this.lastProfit) {
-        // if (moneyProfit > this.lastProfit && moneyProfit > 0) {
-            if (Math.random() < settings.actions.repeatChance) {
-                action = this.lastAction;
-            } else {
-                const randomActionIdx = Math.floor(settings.actions.list.length * Math.random());
-                action.type = settings.actions.list[randomActionIdx];
-                action.value = generateValue(settings.actions.value, false);
-            }
-        } else {
-            if (this.lastAction !== null) {
-                this.cancelAction(this.lastAction);
-            }
-            const randomActionIdx = Math.floor(settings.actions.list.length * Math.random());
-            action.type = settings.actions.list[randomActionIdx];
-            action.value = generateValue(settings.actions.value, false);
-        }
-        this.applyAction(action);
-        this.lastAction = action;
-        this.lastProfit = moneyProfit;
+        this.optimizer.optimize(moneyProfit);
         this.earnings = 0;
         this.sellings = 0;
     }
@@ -120,30 +126,6 @@ class Business {
         }
     }
 
-    applyAction(action) {
-        if (action.type === '+PRICE') {
-            this.price *= action.value;
-        } else if (action.type === '-PRICE') {
-            this.price /= action.value;
-        } else if (action.type === '+SALARY') {
-            this.salary *= action.value;
-        } else if (action.type === '-SALARY') {
-            this.salary /= action.value;
-        }
-    }
-
-    cancelAction(action) {
-        if (action.type === '+PRICE') {
-            this.price /= action.value;
-        } else if (action.type === '-PRICE') {
-            this.price *= action.value;
-        } else if (action.type === '+SALARY') {
-            this.salary /= action.value;
-        } else if (action.type === '-SALARY') {
-            this.salary *= action.value;
-        }
-    }
-
     calcRoadTime(worker) {
         const dx = worker.position.x - this.position.x;
         const dy = worker.position.y - this.position.y;
@@ -157,11 +139,11 @@ class Business {
     }
 
     calcWorkPower(worker) {
-        let sum = 0;
-        for (let skillIndex of this.requiredSkills) {
-            sum += worker.skills[skillIndex];
-        }
-        return sum / this.requiredSkills.size;
+       let sum = 0;
+       for (let skillIndex of this.requiredSkills) {
+           sum += worker.skills[skillIndex] ** 2;
+       }
+       return sum ** 0.5 / this.requiredSkills.size ** 0.5;
     }
 
     calcWorkSalary(worker) {
