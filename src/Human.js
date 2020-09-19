@@ -1,37 +1,66 @@
-import Business from './Business.js';
+import { Business } from './Business.js';
 import generateValue from './Generator.js';
-
-const MONEY = {
-    average: 1000000,
-    delta: 500000,
-};
-
-const SKILL = {
-    min: 0,
-    max: 1,
-};
-
-const NEED = {
-    min: 1,
-    max: 10,
-}
-
-const AVANTURISM = {
-    min: 0,
-    max: 1,
-};
-
-const POSITION = {
-    min: -10000,
-    max: 10000,
-}
+import Optimizer from './Optimizer.js';
 
 const settings = {
+    MONEY: {
+        average: 1000000,
+        delta: 500000,
+    },
+    SKILL: {
+        min: 0,
+        max: 1,
+    },
+    NEED: {
+        min: 1,
+        max: 10,
+    },
+    AVANTURISM: {
+        min: 0,
+        max: 1,
+    },
+    POSITION: {
+        min: -10000,
+        max: 10000,
+    },
     freetime: 320,
     speedPixelsPerHour: 10,
     businessLuck: 0.01,
     leavingLuck: 1,
-};
+    moveActions: {
+        list: [
+            {
+                name: 'RIGHT',
+                apply: (human, value) => { human.position.x += value },
+                cancel: (human, value) => { human.position.x -= value },
+            },
+            {
+                name: 'LEFT',
+                apply: (human, value) => { human.position.x -= value },
+                cancel: (human, value) => { human.position.x += value },
+            },
+            {
+                name: 'UP',
+                apply: (human, value) => { human.position.y -= value },
+                cancel: (human, value) => { human.position.y += value },
+            },
+            {
+                name: 'DOWN',
+                apply: (human, value) => { human.position.y += value },
+                cancel: (human, value) => { human.position.y -= value },
+            },
+            {
+                name: 'STAY',
+                apply: (human, value) => {},
+                cancel: (human, value) => {},
+            },
+        ],
+        value: {
+            min: 10,
+            max: 100,
+        }
+    }
+}
 
 class Human {
     constructor(skillsNumber, needsNumber, world) {
@@ -45,14 +74,15 @@ class Human {
         this.work = null;
         this.business = null;
         this.color = 0xFFFFFF;
+        this.positionOptimizer = new Optimizer(this, settings.moveActions.list, settings.moveActions.value);
 
         this.generateSkills(skillsNumber);
         this.generateNeeds(needsNumber);
-        this.money = generateValue(MONEY);
-        this.avanturism = generateValue(AVANTURISM, false);
+        this.money = generateValue(settings.MONEY);
+        this.avanturism = generateValue(settings.AVANTURISM, false);
         this.position = {
-            x: generateValue(POSITION),
-            y: generateValue(POSITION),
+            x: generateValue(settings.POSITION),
+            y: generateValue(settings.POSITION),
         };
     }
 
@@ -60,6 +90,7 @@ class Human {
         this.use();
         this.spend();
         this.earn();
+        // this.positionOptimizer.optimize(this.worktime);
     }
 
     use() {
@@ -186,16 +217,16 @@ class Human {
     generateSkills(skillsNumber) {
         this.skills = [];
         for (let i = 0; i < skillsNumber; i++) {
-            this.skills.push(generateValue(SKILL, false));
+            this.skills.push(generateValue(settings.SKILL, false));
         }
     }
 
     generateNeeds(needsNumber) {
         this.needs = [];
         for (let i = 0; i < needsNumber; i++) {
-            this.needs.push(generateValue(NEED));
+            this.needs.push(generateValue(settings.NEED));
         }
     }
 }
 
-export default Human;
+export { Human, settings };

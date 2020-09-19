@@ -1,7 +1,7 @@
 const system = {
     offset: {
-        x: 0,
-        y: 0,
+        x: -10000,
+        y: -10000,
         max: {
             x: 10000,
             y: 10000,
@@ -13,7 +13,7 @@ const system = {
         speed: 0.1,
     },
     zoom: {
-        value: 1,
+        value: 0.026,
         speed: 1.001,
         max: 10,
         min: 0.01,

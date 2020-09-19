@@ -1,4 +1,24 @@
-h1 {
-  color: red;
-  text-align: center;
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.setting-block {
+  display: inline-block;
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.setting {
+  width: 150px;
+}
+
+.setting-block h5 {
+  font-weight: normal;
+  margin: 0;
 }

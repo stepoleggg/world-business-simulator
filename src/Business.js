@@ -176,4 +176,4 @@ class Business {
     }
 }
 
-export default Business;
+export { Business, settings };
