@@ -1,6 +1,7 @@
 import { Business } from './Business.js';
 import generateValue from './Generator.js';
 import Optimizer from './Optimizer.js';
+import { giveBenefit } from './Government.js';
 
 const settings = {
     MONEY: {
@@ -103,6 +104,7 @@ class Human {
     }
 
     earn() {
+        giveBenefit(this);
         if (this.work === null && this.business === null) {
             this.findWork();
         }

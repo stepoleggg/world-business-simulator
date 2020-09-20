@@ -1,5 +1,6 @@
 import generateValue from './Generator.js';
 import Optimizer from './Optimizer.js';
+import { payBusinessSellingTax } from './Government.js';
 
 const settings = {
     startPrice: {
@@ -117,9 +118,12 @@ class Business {
 
     sell(human) {
         this.producted -= 1;
-        this.earnings += this.price;
         this.sellings += 1;
-        this.owner.money += this.price;
+
+        const gotMoney = payBusinessSellingTax(this.price);
+        this.earnings += gotMoney;
+        this.owner.money += gotMoney;
+
         human.money -= this.price;
         for(let serviceIdx of this.services) {
             human.needs[serviceIdx]++;

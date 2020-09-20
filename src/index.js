@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { Human, settings as humanSettings } from './Human.js';
 import { settings as businessSettings } from './Business.js';
+import { settings as governmentSettings } from './Government.js';
 import Setting from './Setting.js';
 import painter from './Painter.js';
 import './styles/index.css';
@@ -54,6 +55,10 @@ inputsRealtime.push(new Setting('Стартовая доля оплаты раб
 inputsRealtime.push(new Setting('Изменение цены или зп. Среднее', parseFloat, (value) => { businessSettings.actions.value.average = value }, () => businessSettings.actions.value.average));
 inputsRealtime.push(new Setting('Изменение цены или зп. Максимальное отклонение', parseFloat, (value) => { businessSettings.actions.value.delta = value }, () => businessSettings.actions.value.delta));
 inputsRealtime.push(new Setting('Вероятность повтора успешного действия бизнесмена', parseFloat, (value) => { businessSettings.actions.repeatChance = value }, () => businessSettings.actions.repeatChance));
+inputsRealtime.push(new Setting('Доля налога с продажи 1 товара', parseFloat, (value) => { governmentSettings.taxes.business.selling = value }, () => governmentSettings.taxes.business.selling));
+inputsRealtime.push(new Setting('Пособие по безработице', parseFloat, (value) => { governmentSettings.privileges.unemployed.monthly = value }, () => governmentSettings.privileges.unemployed.monthly));
+inputsRealtime.push(new Setting('Ежемесячная поддержка рабочих', parseFloat, (value) => { governmentSettings.privileges.worker.monthly = value }, () => governmentSettings.privileges.worker.monthly));
+
 
 for (let input of inputsToReload) {
     document.getElementById('restart-settings').innerHTML += input.getBody();
@@ -154,6 +159,7 @@ const live = () => {
     }
 
     document.getElementById('stat').innerHTML = `
+        Бюджет государства: ${governmentSettings.budget}<br>
         Средняя цена: ${averagePrice}<br>
         Средняя ЗП в час: ${averageSalary}<br>
         Средняя ЗП в месяц: ${averageFullSalary}<br>
